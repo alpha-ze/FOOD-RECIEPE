@@ -78,115 +78,65 @@
     &copy; 2024 Ingredient to Food Predictor. All rights reserved.
   </footer>
 
-  <script>
-    const ingredientImageInput = document.getElementById('ingredientImage');
-    const predictBtn = document.getElementById('predictBtn');
-    const previewContainer = document.getElementById('previewContainer');
-    const previewImage = document.getElementById('previewImage');
-    const resultContainer = document.getElementById('resultContainer');
-    const predictedFood = document.getElementById('predictedFood');
-    const foodImage = document.getElementById('foodImage');
-    const uploadForm = document.getElementById('uploadForm');
+<script>
+  const ingredientImageInput = document.getElementById("ingredientImage");
+  const predictBtn = document.getElementById("predictBtn");
+  const previewContainer = document.getElementById("previewContainer");
+  const previewImage = document.getElementById("previewImage");
+  const resultContainer = document.getElementById("resultContainer");
+  const predictedFood = document.getElementById("predictedFood");
+  const foodImage = document.getElementById("foodImage");
+  const uploadForm = document.getElementById("uploadForm");
 
-    ingredientImageInput.addEventListener('change', () => {
-      if (ingredientImageInput.files && ingredientImageInput.files[0]) {
-        predictBtn.disabled = false;
-        const file = ingredientImageInput.files[0];
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          previewImage.src = e.target.result;
-          previewContainer.classList.remove('hidden');
-          resultContainer.classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-      } else {
-        predictBtn.disabled = true;
-        previewContainer.classList.add('hidden');
-        resultContainer.classList.add('hidden');
-      }
-    });
+  ingredientImageInput.addEventListener("change", () => {
+    if (ingredientImageInput.files && ingredientImageInput.files[0]) {
+      predictBtn.disabled = false;
+      const file = ingredientImageInput.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        previewImage.src = e.target.result;
+        previewContainer.classList.remove("hidden");
+        resultContainer.classList.add("hidden");
+      };
+      reader.readAsDataURL(file);
+    } else {
+      predictBtn.disabled = true;
+      previewContainer.classList.add("hidden");
+      resultContainer.classList.add("hidden");
+    }
+  });
 
-    function predictFoodFromIngredients() {
-      const foods = [
-        {
-          name: 'Spaghetti Bolognese',
-          image:
-            'https://placehold.co/400x300/png?text=Spaghetti+Bolognese&font=roboto',
-          alt: 'A plate of spaghetti bolognese with rich tomato sauce and minced meat garnished with parsley',
-        },
-        {
-          name: 'Vegetable Stir Fry',
-          image:
-            'https://placehold.co/400x300/png?text=Vegetable+Stir+Fry&font=roboto',
-          alt: 'A colorful vegetable stir fry with broccoli, bell peppers, carrots, and snap peas in a wok',
-        },
-        {
-          name: 'Chicken Curry',
-          image:
-            'https://placehold.co/400x300/png?text=Chicken+Curry&font=roboto',
-          alt: 'A bowl of chicken curry with creamy sauce, garnished with fresh cilantro and served with rice',
-        },
-        {
-          name: 'Caprese Salad',
-          image:
-            'https://placehold.co/400x300/png?text=Caprese+Salad&font=roboto',
-          alt: 'A fresh caprese salad with sliced tomatoes, mozzarella, basil leaves, and balsamic glaze',
-        },
-        {
-          name: 'Pancakes with Berries',
-          image:
-            'https://placehold.co/400x300/png?text=Pancakes+with+Berries&font=roboto',
-          alt: 'Stack of fluffy pancakes topped with fresh mixed berries and maple syrup on a white plate',
-        },
-        {
-          name: 'Guacamole with Chips',
-          image:
-            'https://placehold.co/400x300/png?text=Guacamole+with+Chips&font=roboto',
-          alt: 'A bowl of creamy guacamole served with crispy tortilla chips on a rustic wooden table',
-        },
-        {
-          name: 'Tomato Soup',
-          image:
-            'https://placehold.co/400x300/png?text=Tomato+Soup&font=roboto',
-          alt: 'A bowl of smooth tomato soup garnished with cream swirl and fresh basil leaves',
-        },
-        {
-          name: 'Grilled Cheese Sandwich',
-          image:
-            'https://placehold.co/400x300/png?text=Grilled+Cheese+Sandwich&font=roboto',
-          alt: 'A grilled cheese sandwich with melted cheddar cheese and toasted golden bread on a plate',
-        },
-        {
-          name: 'Caesar Salad',
-          image:
-            'https://placehold.co/400x300/png?text=Caesar+Salad&font=roboto',
-          alt: 'A bowl of Caesar salad with romaine lettuce, croutons, parmesan cheese, and creamy dressing',
-        },
-        {
-          name: 'Beef Tacos',
-          image:
-            'https://placehold.co/400x300/png?text=Beef+Tacos&font=roboto',
-          alt: 'Three beef tacos filled with seasoned ground beef, lettuce, cheese, and salsa on a plate',
-        }
-      ];
-      const randomIndex = Math.floor(Math.random() * foods.length);
-      return foods[randomIndex];
+  uploadForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    predictBtn.disabled = true;
+    predictBtn.textContent = "Predicting...";
+
+    const formData = new FormData();
+    formData.append("ingredientImage", ingredientImageInput.files[0]);
+
+    try {
+      const res = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      predictedFood.innerHTML = `
+        <strong>${data.name}</strong><br/>
+        <span class="block mt-2 text-sm text-gray-600"><strong>Ingredients:</strong> ${data.ingredients}</span><br/>
+        <span class="block mt-2 text-sm text-gray-600"><strong>Procedure:</strong> ${data.procedure}</span><br/>
+        <span class="block mt-2 text-sm text-gray-600"><strong>Serving:</strong> ${data.serving}</span>
+      `;
+      foodImage.src = data.image;
+      resultContainer.classList.remove("hidden");
+    } catch (error) {
+      console.error("Prediction failed", error);
+      alert("Something went wrong while predicting.");
     }
 
-    uploadForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      predictBtn.disabled = true;
-      predictBtn.textContent = 'Predicting...';
-      setTimeout(() => {
-        const prediction = predictFoodFromIngredients();
-        predictedFood.textContent = prediction.name;
-        foodImage.src = prediction.image;
-        foodImage.alt = prediction.alt;
-        resultContainer.classList.remove('hidden');
-        predictBtn.textContent = 'Predict Food Item';
-        predictBtn.disabled = false;
-      }, 1500);
-    });
-  </script>
+    predictBtn.textContent = "Predict Food Item";
+    predictBtn.disabled = false;
+  });
+</script>
 </body>
 </html>
