@@ -1,0 +1,192 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ingredient to Food Predictor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow p-4 flex items-center justify-center">
+    <h1 class="text-2xl font-bold text-gray-800">Ingredient to Food Predictor</h1>
+  </header>
+
+  <main class="flex-grow container mx-auto px-4 py-8 max-w-xl">
+    <section class="bg-white rounded-lg shadow p-6">
+      <form id="uploadForm" class="flex flex-col items-center space-y-6">
+        <label
+          for="ingredientImage"
+          class="cursor-pointer w-full flex flex-col items-center justify-center border-4 border-dashed border-gray-300 rounded-lg p-6 hover:border-indigo-500 transition-colors"
+        >
+          <i class="fas fa-cloud-upload-alt text-indigo-500 text-6xl mb-4"></i>
+          <span class="text-gray-600 font-medium">Click or tap to upload an image of your ingredients</span>
+          <input
+            type="file"
+            id="ingredientImage"
+            name="ingredientImage"
+            accept="image/*"
+            class="hidden"
+            required
+          />
+        </label>
+        <button
+          type="submit"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg w-full disabled:opacity-50 disabled:cursor-not-allowed"
+          id="predictBtn"
+          disabled
+        >
+          Predict Food Item
+        </button>
+      </form>
+
+      <div id="previewContainer" class="mt-6 hidden flex flex-col items-center">
+        <h2 class="text-lg font-semibold text-gray-700 mb-2">Uploaded Image Preview</h2>
+        <img
+          id="previewImage"
+          src=""
+          alt="Preview of uploaded ingredients image showing various fresh vegetables and spices on a wooden table"
+          class="rounded-lg max-w-full max-h-64 object-contain shadow"
+        />
+      </div>
+
+      <div id="resultContainer" class="mt-8 hidden bg-indigo-50 border border-indigo-200 rounded-lg p-6 text-center">
+        <h2 class="text-xl font-bold text-indigo-700 mb-4">Predicted Food Item</h2>
+        <p id="predictedFood" class="text-gray-800 text-lg"></p>
+        <img
+          id="foodImage"
+          src=""
+          alt="Image of the predicted food item"
+          class="mt-4 mx-auto rounded-lg max-w-full max-h-48 object-contain shadow"
+        />
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-white shadow p-4 text-center text-gray-500 text-sm">
+    &copy; 2024 Ingredient to Food Predictor. All rights reserved.
+  </footer>
+
+  <script>
+    const ingredientImageInput = document.getElementById('ingredientImage');
+    const predictBtn = document.getElementById('predictBtn');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const resultContainer = document.getElementById('resultContainer');
+    const predictedFood = document.getElementById('predictedFood');
+    const foodImage = document.getElementById('foodImage');
+    const uploadForm = document.getElementById('uploadForm');
+
+    ingredientImageInput.addEventListener('change', () => {
+      if (ingredientImageInput.files && ingredientImageInput.files[0]) {
+        predictBtn.disabled = false;
+        const file = ingredientImageInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImage.src = e.target.result;
+          previewContainer.classList.remove('hidden');
+          resultContainer.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        predictBtn.disabled = true;
+        previewContainer.classList.add('hidden');
+        resultContainer.classList.add('hidden');
+      }
+    });
+
+    function predictFoodFromIngredients() {
+      const foods = [
+        {
+          name: 'Spaghetti Bolognese',
+          image:
+            'https://placehold.co/400x300/png?text=Spaghetti+Bolognese&font=roboto',
+          alt: 'A plate of spaghetti bolognese with rich tomato sauce and minced meat garnished with parsley',
+        },
+        {
+          name: 'Vegetable Stir Fry',
+          image:
+            'https://placehold.co/400x300/png?text=Vegetable+Stir+Fry&font=roboto',
+          alt: 'A colorful vegetable stir fry with broccoli, bell peppers, carrots, and snap peas in a wok',
+        },
+        {
+          name: 'Chicken Curry',
+          image:
+            'https://placehold.co/400x300/png?text=Chicken+Curry&font=roboto',
+          alt: 'A bowl of chicken curry with creamy sauce, garnished with fresh cilantro and served with rice',
+        },
+        {
+          name: 'Caprese Salad',
+          image:
+            'https://placehold.co/400x300/png?text=Caprese+Salad&font=roboto',
+          alt: 'A fresh caprese salad with sliced tomatoes, mozzarella, basil leaves, and balsamic glaze',
+        },
+        {
+          name: 'Pancakes with Berries',
+          image:
+            'https://placehold.co/400x300/png?text=Pancakes+with+Berries&font=roboto',
+          alt: 'Stack of fluffy pancakes topped with fresh mixed berries and maple syrup on a white plate',
+        },
+        {
+          name: 'Guacamole with Chips',
+          image:
+            'https://placehold.co/400x300/png?text=Guacamole+with+Chips&font=roboto',
+          alt: 'A bowl of creamy guacamole served with crispy tortilla chips on a rustic wooden table',
+        },
+        {
+          name: 'Tomato Soup',
+          image:
+            'https://placehold.co/400x300/png?text=Tomato+Soup&font=roboto',
+          alt: 'A bowl of smooth tomato soup garnished with cream swirl and fresh basil leaves',
+        },
+        {
+          name: 'Grilled Cheese Sandwich',
+          image:
+            'https://placehold.co/400x300/png?text=Grilled+Cheese+Sandwich&font=roboto',
+          alt: 'A grilled cheese sandwich with melted cheddar cheese and toasted golden bread on a plate',
+        },
+        {
+          name: 'Caesar Salad',
+          image:
+            'https://placehold.co/400x300/png?text=Caesar+Salad&font=roboto',
+          alt: 'A bowl of Caesar salad with romaine lettuce, croutons, parmesan cheese, and creamy dressing',
+        },
+        {
+          name: 'Beef Tacos',
+          image:
+            'https://placehold.co/400x300/png?text=Beef+Tacos&font=roboto',
+          alt: 'Three beef tacos filled with seasoned ground beef, lettuce, cheese, and salsa on a plate',
+        }
+      ];
+      const randomIndex = Math.floor(Math.random() * foods.length);
+      return foods[randomIndex];
+    }
+
+    uploadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      predictBtn.disabled = true;
+      predictBtn.textContent = 'Predicting...';
+      setTimeout(() => {
+        const prediction = predictFoodFromIngredients();
+        predictedFood.textContent = prediction.name;
+        foodImage.src = prediction.image;
+        foodImage.alt = prediction.alt;
+        resultContainer.classList.remove('hidden');
+        predictBtn.textContent = 'Predict Food Item';
+        predictBtn.disabled = false;
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
